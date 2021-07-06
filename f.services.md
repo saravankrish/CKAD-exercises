@@ -86,6 +86,12 @@ status:
   loadBalancer: {}
 ```
 
+or
+
+```bash
+kubectl patch svc nginx -p '{"spec":{"type":"NodePort"}}' 
+```
+
 ```bash
 kubectl get svc
 ```
@@ -114,52 +120,13 @@ kubectl delete pod nginx # Deletes the pod
 <details><summary>show</summary>
 <p>
 
-
 ```bash
-kubectl run foo --image=dgkanatsios/simpleapp --labels=app=foo --port=8080 --replicas=3
-```
-Or, you can use the more recent approach of creating the requested deployment as kubectl run has been deprecated.
-
-```bash
-kubectl create deploy foo --image=dgkanatsios/simpleapp --dry-run=client -o yaml > foo.yml
-
-vi foo.yml
-```
-
-Update the yaml to update the replicas and add container port.
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  creationTimestamp: null
-  labels:
-    app: foo
-  name: foo
-spec:
-  replicas: 3 # Update this
-  selector:
-    matchLabels:
-      app: foo
-  strategy: {}
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        app: foo
-    spec:
-      containers:
-      - image: dgkanatsios/simpleapp
-        name: simpleapp
-        ports:                   # Add this
-          - containerPort: 8080  # Add this
-        resources: {}
-status: {}
+kubectl create deploy foo --image=dgkanatsios/simpleapp --port=8080 --replicas=3
 ```
 </p>
 </details>
 
-### Get the pod IPs. Create a temp busybox pod and trying hitting them on port 8080
+### Get the pod IPs. Create a temp busybox pod and try hitting them on port 8080
 
 <details><summary>show</summary>
 <p>
@@ -171,6 +138,8 @@ kubectl run busybox --image=busybox --restart=Never -it --rm -- sh
 wget -O- POD_IP:8080 # do not try with pod name, will not work
 # try hitting all IPs to confirm that hostname is different
 exit
+# or
+kubectl get po -o wide -l app=foo | awk '{print $6}' | grep -v IP | xargs -L1 -I '{}' kubectl run --rm -ti tmp --restart=Never --image=busybox -- wget -O- http://\{\}:8080
 ```
 
 </p>
@@ -217,8 +186,10 @@ kubernetes.io > Documentation > Concepts > Services, Load Balancing, and Network
 <p>
 
 ```bash
-kubectl run nginx --image=nginx --replicas=2 --port=80 --expose
-kubectl describe svc nginx # see the 'run=nginx' selector for the pods
+kubectl create deployment nginx --image=nginx --replicas=2
+kubectl expose deployment nginx --port=80
+
+kubectl describe svc nginx # see the 'app=nginx' selector for the pods
 # or
 kubectl get svc nginx -o yaml
 
@@ -233,7 +204,7 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      run: nginx # selector for the pods
+      app: nginx # selector for the pods
   ingress: # allow ingress traffic
   - from:
     - podSelector: # from pods
