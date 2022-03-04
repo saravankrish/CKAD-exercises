@@ -2,7 +2,7 @@
 # Pod design (20%)
 
 ## Labels and annotations
-kubernetes.io > Documentation > Concepts > Overview > [Labels and Selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)
+kubernetes.io > Documentation > Concepts > Overview > Working with Kubernetes Objects > [Labels and Selectors](https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors)
 
 ### Create 3 pods with names nginx1,nginx2,nginx3. All of them should have the label app=v1
 
@@ -14,7 +14,7 @@ kubectl run nginx1 --image=nginx --restart=Never --labels=app=v1
 kubectl run nginx2 --image=nginx --restart=Never --labels=app=v1
 kubectl run nginx3 --image=nginx --restart=Never --labels=app=v1
 # or
-for i in `seq 1 3`; do k run nginx$i --image=nginx -l app=v1 ; done
+for i in `seq 1 3`; do kubectl run nginx$i --image=nginx -l app=v1 ; done
 ```
 
 </p>
@@ -171,6 +171,10 @@ kubectl annotate po nginx{1..3} description='my description'
 <p>
 
 ```bash
+kubectl annotate pod nginx1 --list
+
+# or
+
 kubectl describe po nginx1 | grep -i 'annotations'
 
 # or
@@ -209,7 +213,7 @@ kubectl delete po nginx{1..3}
 
 ## Deployments
 
-kubernetes.io > Documentation > Concepts > Workloads > Controllers > [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment)
+kubernetes.io > Documentation > Concepts > Workloads > Workload Resources > [Deployments](https://kubernetes.io/docs/concepts/workloads/controllers/deployment)
 
 ### Create a deployment with image nginx:1.18.0, called nginx, having 2 replicas, defining port 80 as the port that this container exposes (don't create a service for this deployment)
 
@@ -232,7 +236,7 @@ or, do something like:
 kubectl create deployment nginx  --image=nginx:1.18.0  --dry-run=client -o yaml | sed 's/replicas: 1/replicas: 2/g'  | sed 's/image: nginx:1.18.0/image: nginx:1.18.0\n        ports:\n        - containerPort: 80/g' | kubectl apply -f -
 ```
 
-or, 
+or,
 ```bash
 kubectl create deploy nginx --image=nginx:1.18.0 --replicas=2 --port=80
 ```
@@ -510,17 +514,18 @@ kubectl get po # get the pod name
 kubectl logs pi-**** # get the pi numbers
 kubectl delete job pi
 ```
-OR 
+OR
 
 ```bash
 kubectl get jobs -w # wait till 'SUCCESSFUL' is 1 (will take some time, perl image might be big)
 kubectl logs job/pi
 kubectl delete job pi
 ```
-OR 
+OR
 
 ```bash
-kubectl wait --for=condition=complete --timeout=300 job pi
+kubectl wait --for=condition=complete --timeout=300s job pi
+kubectl logs job/pi
 kubectl delete job pi
 ```
 
@@ -582,12 +587,12 @@ kubectl delete job busybox
 
 <details><summary>show</summary>
 <p>
-  
+
 ```bash
 kubectl create job busybox --image=busybox --dry-run=client -o yaml -- /bin/sh -c 'while true; do echo hello; sleep 10;done' > job.yaml
 vi job.yaml
 ```
-  
+
 Add job.spec.activeDeadlineSeconds=30
 
 ```bash
@@ -760,7 +765,7 @@ kubectl delete cj busybox
 </p>
 </details>
 
-### Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its schedule.
+### Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it takes more than 17 seconds to start execution after its scheduled time (i.e. the job missed its scheduled time).
 
 <details><summary>show</summary>
 <p>
@@ -769,7 +774,51 @@ kubectl delete cj busybox
 kubectl create cronjob time-limited-job --image=busybox --restart=Never --dry-run=client --schedule="* * * * *" -o yaml -- /bin/sh -c 'date; echo Hello from the Kubernetes cluster' > time-limited-job.yaml
 vi time-limited-job.yaml
 ```
-Add cronjob.spec.jobTemplate.spec.activeDeadlineSeconds=17
+Add cronjob.spec.startingDeadlineSeconds=17
+
+```bash
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  creationTimestamp: null
+  name: time-limited-job
+spec:
+  startingDeadlineSeconds: 17 # add this line
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: time-limited-job
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+        spec:
+          containers:
+          - args:
+            - /bin/sh
+            - -c
+            - date; echo Hello from the Kubernetes cluster
+            image: busybox
+            name: time-limited-job
+            resources: {}
+          restartPolicy: Never
+  schedule: '* * * * *'
+status: {}
+```
+
+</p>
+</details>
+
+### Create a cron job with image busybox that runs every minute and writes 'date; echo Hello from the Kubernetes cluster' to standard output. The cron job should be terminated if it successfully starts but takes more than 12 seconds to complete execution.
+
+<details><summary>show</summary>
+<p>
+
+```bash
+kubectl create cronjob time-limited-job --image=busybox --restart=Never --dry-run=client --schedule="* * * * *" -o yaml -- /bin/sh -c 'date; echo Hello from the Kubernetes cluster' > time-limited-job.yaml
+vi time-limited-job.yaml
+```
+Add cronjob.spec.jobTemplate.spec.activeDeadlineSeconds=12
 
 ```bash
 apiVersion: batch/v1beta1
@@ -783,7 +832,7 @@ spec:
       creationTimestamp: null
       name: time-limited-job
     spec:
-      activeDeadlineSeconds: 17 # add this line
+      activeDeadlineSeconds: 12 # add this line
       template:
         metadata:
           creationTimestamp: null

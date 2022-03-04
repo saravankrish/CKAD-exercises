@@ -6,7 +6,7 @@
 
 A set of exercises that helped me prepare for the [Certified Kubernetes Application Developer](https://www.cncf.io/certification/ckad/) exam, offered by the Cloud Native Computing Foundation, organized by curriculum domain. They may as well serve as learning and practicing with Kubernetes.
 
-During the exam, you are allowed to keep only one other browser tab open to refer official documentation. Make a mental note of the breadcrumb at the start of the excercise section, to quickly locate the relevant document in kubernetes.io. It is recommended that you read official documents before attempting exercises below it.
+During the exam, you are allowed to keep only one other browser tab open to refer to official documentation. Make a mental note of the breadcrumb at the start of the excercise section, to quickly locate the relevant document in kubernetes.io. It is recommended that you read the official documents before attempting exercises below it.
 
 ## Contents
 
@@ -18,12 +18,12 @@ During the exam, you are allowed to keep only one other browser tab open to refe
 - [Services and networking - 13%](f.services.md)
 - [State persistence - 8%](g.state.md)
 
+> If your work is related to multiplayer game servers, checkout out [thundernetes, a brand new project to host game servers on Kubernetes](https://github.com/PlayFab/thundernetes)!
+
 ### Can I PR? There is an error/an alternative way/an extra question/solution I can offer
 
 Absolutely! Feel free to PR and edit/add questions and solutions, but please stick to the existing format.
 
-### References
-- [here](https://github.com/twajr/ckad-prep-notes) from twajr
-- [here](https://www.reddit.com/r/kubernetes/comments/9uydc1/passed_the_ckad_special_thanks_to_the_linux/) from Blockchain0
-- [here](https://medium.com/devopslinks/my-story-towards-cka-ckad-and-some-tips-daf495e711a9) from abdennour
-- [here](https://medium.com/chotot-techblog/tips-tricks-to-pass-certified-kubernetes-application-developer-ckad-exam-67c9e1b32e6e) from Anh Dang
+If this repo has helped you in any way, feel free to post on [discussions](https://github.com/dgkanatsios/CKAD-exercises/discussions) or buy me a coffee!
+
+<a href="https://www.buymeacoffee.com/dgkanatsios" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>

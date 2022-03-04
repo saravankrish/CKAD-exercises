@@ -122,6 +122,7 @@ kubectl delete pod nginx # Deletes the pod
 
 ```bash
 kubectl create deploy foo --image=dgkanatsios/simpleapp --port=8080 --replicas=3
+kubectl label deployment foo --overwrite app=foo
 ```
 </p>
 </details>
@@ -154,7 +155,7 @@ kubectl get po -o wide -l app=foo | awk '{print $6}' | grep -v IP | xargs -L1 -I
 ```bash
 kubectl expose deploy foo --port=6262 --target-port=8080
 kubectl get service foo # you will see ClusterIP as well as port 6262
-kubectl get endpoints foo # you will see the IPs of the three replica nodes, listening on port 8080
+kubectl get endpoints foo # you will see the IPs of the three replica pods, listening on port 8080
 ```
 
 </p>
@@ -182,6 +183,8 @@ kubectl delete deploy foo
 
 kubernetes.io > Documentation > Concepts > Services, Load Balancing, and Networking > [Network Policies](https://kubernetes.io/docs/concepts/services-networking/network-policies/)
 
+> Note that network policies may not be enforced by default, depending on your k8s implementation. E.g. Azure AKS by default won't have policy enforcement, the cluster must be created with an explicit support for `netpol` https://docs.microsoft.com/en-us/azure/aks/use-network-policies#overview-of-network-policy  
+  
 <details><summary>show</summary>
 <p>
 
