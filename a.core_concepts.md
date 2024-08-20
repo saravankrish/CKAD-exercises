@@ -78,7 +78,7 @@ kubectl run nginx --image=nginx --restart=Never --dry-run=client -o yaml | kubec
 <p>
 
 ```bash
-kubectl run busybox --image=busybox --command --restart=Never -it -- env # -it will help in seeing the output
+kubectl run busybox --image=busybox --command --restart=Never -it --rm -- env # -it will help in seeing the output, --rm will immediately delete the pod after it exits
 # or, just run it without -it
 kubectl run busybox --image=busybox --command --restart=Never -- env
 # and then, check its logs
@@ -141,7 +141,7 @@ kubectl create namespace myns -o yaml --dry-run=client
 </p>
 </details>
 
-### Get the YAML for a new ResourceQuota called 'myrq' with hard limits of 1 CPU, 1G memory and 2 pods without creating it
+### Create the YAML for a new ResourceQuota called 'myrq' with hard limits of 1 CPU, 1G memory and 2 pods without creating it
 
 <details><summary>show</summary>
 <p>
@@ -357,6 +357,8 @@ kubectl exec -it nginx -- sh -c 'echo $var1'
 kubectl describe po nginx | grep val1
 # or
 kubectl run nginx --restart=Never --image=nginx --env=var1=val1 -it --rm -- env
+# or
+kubectl run nginx --image nginx --restart=Never --env=var1=val1 -it --rm -- sh -c 'echo $var1'
 ```
 
 </p>

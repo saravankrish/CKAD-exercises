@@ -58,12 +58,21 @@ spec:
   - name: myvolume #
     emptyDir: {} #
 ```
+In case you forget to add ```bash -- /bin/sh -c 'sleep 3600'``` in template pod create command, you can include command field in config file
+
+```YAML
+spec:
+  containers:
+  - image: busybox
+    name: busybox
+    command: ["/bin/sh", "-c", "sleep 3600"]
+```
 
 Connect to the second container:
 
 ```bash
 kubectl exec -it busybox -c busybox2 -- /bin/sh
-cat /etc/passwd | cut -f 1 -d ':' > /etc/foo/passwd 
+cat /etc/passwd | cut -f 1 -d ':' > /etc/foo/passwd # instead of cut command you can use awk -F ":" '{print $1}'
 cat /etc/foo/passwd # confirm that stuff has been written successfully
 exit
 ```
@@ -232,6 +241,8 @@ kubectl create -f pod.yaml
 kubectl exec busybox2 -- ls /etc/foo # will show 'passwd'
 # cleanup
 kubectl delete po busybox busybox2
+kubectl delete pvc mypvc
+kubectl delete pv myvolume
 ```
 
 If the file doesn't show on the second pod but it shows on the first, it has most likely been scheduled on a different node.

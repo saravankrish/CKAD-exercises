@@ -58,7 +58,7 @@ kubectl delete po busybox
 Easiest way to do it is create a pod with a single container and save its definition in a YAML file:
 
 ```bash
-kubectl run web --image=nginx --restart=Never --port=80 --dry-run=client -o yaml > pod-init.yaml
+kubectl run box --image=nginx --restart=Never --port=80 --dry-run=client -o yaml > pod-init.yaml
 ```
 
 Copy/paste the container related values, so your final YAML should contain the volume and the initContainer:
@@ -85,7 +85,7 @@ initContainers:
 - args:
   - /bin/sh
   - -c
-  - wget -O /work-dir/index.html http://neverssl.com/online
+  - "wget -O /work-dir/index.html http://neverssl.com/online"
   image: busybox
   name: box
   volumeMounts:
@@ -108,7 +108,7 @@ spec:
   - args: 
     - /bin/sh 
     - -c 
-    - wget -O /work-dir/index.html http://neverssl.com/online 
+    - "wget -O /work-dir/index.html http://neverssl.com/online"
     image: busybox 
     name: box 
     volumeMounts: 
@@ -135,7 +135,7 @@ kubectl apply -f pod-init.yaml
 kubectl get po -o wide
 
 # Execute wget
-kubectl run box-test --image=busybox --restart=Never -it --rm -- /bin/sh -c "wget -O- IP"
+kubectl run box-test --image=busybox --restart=Never -it --rm -- /bin/sh -c "wget -O- $(kubectl get pod box -o jsonpath='{.status.podIP}')"
 
 # you can do some cleanup
 kubectl delete po box

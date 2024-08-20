@@ -4,12 +4,14 @@
 
 ## CRD in K8s
 
-### Create a CustomResourceDefinition manifest file for an Operator with the following specifications : 
+### Create a CustomResourceDefinition manifest file for an Operator with the following specifications :
+* *Name* : `operators.stable.example.com`
 * *Group* : `stable.example.com`
 * *Schema*: `<email: string><name: string><age: integer>`
 * *Scope*: `Namespaced`
 * *Names*: `<plural: operators><singular: operator><shortNames: op>`
- 
+* *Kind*: `Operator`
+
 <details><summary>show</summary>
 <p>
 
@@ -66,6 +68,13 @@ kubectl apply -f operator-crd.yml
 
 ### Create custom object from the CRD
 
+* *Name* : `operator-sample`
+* *Kind*: `Operator`
+* Spec:
+  * email: `operator-sample@stable.example.com`
+  * name: `operator sample`
+  * age: `30`
+
 <details><summary>show</summary>
 <p>
 
@@ -96,9 +105,9 @@ Use singular, plural and short forms
 
 ```bash
 kubectl get operators
-
+or
 kubectl get operator
-
+or
 kubectl get op
 ```
 
